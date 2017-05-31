@@ -12,10 +12,7 @@ ESP8266WebServer server(80);
 const int LED_PIN = D4;
 const int LED_COUNT = 24;
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
-int color_r = 127;
-int color_g = 127;
-int color_b = 127;
-uint32_t color = strip.Color(color_r, color_g, color_b);
+uint32_t color = strip.Color(127, 127, 127);
 
 char hostString[16] = {0};
 
@@ -31,25 +28,27 @@ void handleRoot() {
 }
 
 void setColor() {
-  String message = "";
+  char message[16] = {0};
+  int r, g, b;
   for (uint8_t i=0; i<server.args(); i++) {
     String arg = server.argName(i);
     int val = server.arg(i).toInt();
     if ((val >= 0) && (val <= 255)) {
       if (arg == "r") {
-        color_r = val;
+        r = val;
       }
       if (arg == "g") {
-        color_g = val;
+        g = val;
       }
       if (arg == "b") {
-        color_b = val;
+        b = val;
       }
     }
   }
-  color = strip.Color(color_r, color_g, color_b);
-  message += "R:" + String(color_r) + " G:" + String(color_g) + " B:" + String(color_b);
+  color = strip.Color(r, g, b);
+  Serial.printf("Color changed to rgb[%d,%d,%d]\n", r, g, b);
   server.send(200, "text/plain", message);
+  storeColor(r, g, b);
   uniColor();
 }
 
@@ -78,9 +77,12 @@ void uniColor() {
 }
 
 void setup(void){
-  pinMode(LED_BUILTIN, OUTPUT);
-  digitalWrite(LED_BUILTIN, LOW);
+  //pinMode(LED_BUILTIN, OUTPUT);
+  //digitalWrite(LED_BUILTIN, LOW);
   Serial.begin(115200);
+  Serial.println("");
+
+  setupEeprom();
 
   strip.begin();
   strip.show(); // Initialize all pixels to 'off'
