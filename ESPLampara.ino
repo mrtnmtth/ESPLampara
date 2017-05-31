@@ -4,9 +4,6 @@
 #include <ESP8266mDNS.h>
 #include <Adafruit_NeoPixel.h>
 
-const char* ssid = "xxx";
-const char* password = "xxx";
-
 ESP8266WebServer server(80);
 
 const int LED_PIN = D4;
@@ -14,7 +11,9 @@ const int LED_COUNT = 24;
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 uint32_t color = strip.Color(127, 127, 127);
 
-char hostString[16] = {0};
+char ssid[32] = {0};
+char password[64] = {0};
+char hostString[32] = {0};
 
 void handleRoot() {
   String message = "<html><title>" + String(hostString) + "</title><body><h2>hello from esp8266!</h2>";
@@ -28,7 +27,7 @@ void handleRoot() {
 }
 
 void setColor() {
-  char message[16] = {0};
+  String message = "";
   int r, g, b;
   for (uint8_t i=0; i<server.args(); i++) {
     String arg = server.argName(i);
@@ -88,10 +87,13 @@ void setup(void){
   strip.show(); // Initialize all pixels to 'off'
   Serial.println("LEDs initialized");
 
-  sprintf(hostString, "LAMPARA_%06X", ESP.getChipId());
+  // set standard hostname if not loaded from EEPROM
+  if (!hostString[0]){
+    sprintf(hostString, "LAMPARA_%06X", ESP.getChipId());
+  }
   WiFi.hostname(hostString);
   WiFi.begin(ssid, password);
-  Serial.println("");
+  Serial.println("Connecting Wifi");
 
   // Wait for connection
   while (WiFi.status() != WL_CONNECTED) {
@@ -110,15 +112,13 @@ void setup(void){
 
   server.on("/", handleRoot);
   server.on("/color", setColor);
-
   server.on("/inline", [](){
     server.send(200, "text/plain", "this works as well");
   });
-
   server.onNotFound(handleNotFound);
-
   server.begin();
   Serial.println("HTTP server started");
+  
   uniColor();
 }
 
