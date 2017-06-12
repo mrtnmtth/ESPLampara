@@ -19,7 +19,9 @@ char hostString[32] = {0};
 void handleRoot() {
   if(SPIFFS.exists("/index.html")){
     File file = SPIFFS.open("/index.html", "r");
-    size_t sent = server.streamFile(file, "text/html");
+    String message = file.readString();
+    message.replace("{{hostname}}", hostString);
+    server.send(200, "text/html", message);
     file.close();
   }
   else handleNotFound();
