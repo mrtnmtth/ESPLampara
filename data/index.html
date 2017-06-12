@@ -1,0 +1,19 @@
+<html>
+<meta charset="utf-8">
+<title>ESPLámpara</title>
+<body>
+<h2>hello from esp8266!</h2>
+<div id="picker"></div>
+<script src="iro.js"></script>
+<script type="text/javascript">
+var size = Math.min(window.innerWidth, window.innerHeight) *0.9;
+var colorPicker = new iro.ColorPicker("#picker",{width: size,height: size,markerRadius: 8,css: {"body":{"background-color": "rgb"}}});
+</script>
+<script type="text/javascript">
+document.getElementById("picker").addEventListener("click", setColor);
+document.getElementById("picker").addEventListener("touchend", setColor);
+function setColor() {var rgb = colorPicker.color.rgb;var req = new XMLHttpRequest();
+req.open("GET", "/color?r="+rgb.r+"&g="+rgb.g+"&b="+rgb.b, true); req.send();};
+</script>
+</body></html>
+

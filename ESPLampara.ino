@@ -3,6 +3,7 @@
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
 #include <Adafruit_NeoPixel.h>
+#include <FS.h>
 
 ESP8266WebServer server(80);
 
@@ -16,14 +17,12 @@ char password[64] = {0};
 char hostString[32] = {0};
 
 void handleRoot() {
-  String message = "<html><title>" + String(hostString) + "</title><body><h2>hello from esp8266!</h2>";
-  message += "<div id=\"picker\"></div>";
-  message += "<script src=\"https://cdn.rawgit.com/jaames/iro.js/master/dist/iro.js\"></script>";
-  message += "<script type=\"text/javascript\">var size = Math.min(window.innerWidth, window.innerHeight) *0.9; var colorPicker = new iro.ColorPicker(\"#picker\",{width: size,height: size,markerRadius: 8,css: {\"body\":{\"background-color\": \"rgb\"}}});</script>";
-  message += "<script type=\"text/javascript\">document.getElementById(\"picker\").addEventListener(\"click\", setColor);document.getElementById(\"picker\").addEventListener(\"touchend\", setColor);";
-  message += "function setColor() {var rgb = colorPicker.color.rgb;var req = new XMLHttpRequest(); req.open(\"GET\", \"/color?r=\"+rgb.r+\"&g=\"+rgb.g+\"&b=\"+rgb.b, true); req.send();}</script>";
-  message += "</body></html>";
-  server.send(200, "text/html", message);
+  if(SPIFFS.exists("/index.html")){
+    File file = SPIFFS.open("/index.html", "r");
+    size_t sent = server.streamFile(file, "text/html");
+    file.close();
+  }
+  else handleNotFound();
 }
 
 void setColor() {
@@ -85,6 +84,7 @@ void setup(void){
 
   strip.begin();
   strip.show(); // Initialize all pixels to 'off'
+  uniColor();
   Serial.println("LEDs initialized");
 
   // set standard hostname if not loaded from EEPROM
@@ -110,16 +110,14 @@ void setup(void){
     Serial.println("MDNS responder started");
   }
 
+  setupFS();
+  
   server.on("/", handleRoot);
   server.on("/color", setColor);
-  server.on("/inline", [](){
-    server.send(200, "text/plain", "this works as well");
-  });
+  server.serveStatic("/iro.js", SPIFFS, "/iro.js");
   server.onNotFound(handleNotFound);
   server.begin();
   Serial.println("HTTP server started");
-  
-  uniColor();
 }
 
 void loop(void){
