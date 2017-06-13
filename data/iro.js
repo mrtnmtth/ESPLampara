@@ -1252,7 +1252,7 @@ wheel.prototype = {
     var hsv = color.hsv;
     // If the V channel has changed, redraw the wheel UI with the new value
     if (changes.v) {
-      this.draw(hsv.v);
+      this.draw(hsv.v+25);
     }
     // If the H or S channel has changed, move the marker to the right position
     if (changes.h || changes.s) {
