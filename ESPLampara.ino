@@ -21,6 +21,7 @@ void handleRoot() {
     File file = SPIFFS.open("/index.html", "r");
     String message = file.readString();
     message.replace("{{hostname}}", hostString);
+    message.replace("{{color}}", colorHexStr());
     server.send(200, "text/html", message);
     file.close();
   }
@@ -74,6 +75,12 @@ void uniColor() {
     strip.show();
     delay(10);
   }
+}
+
+String colorHexStr(){
+  char hex[7];
+  sprintf(hex, "#%x", color);
+  return hex;
 }
 
 void setup(void){
