@@ -12,6 +12,7 @@ const int LED_COUNT = 24;
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 uint32_t color = strip.Color(127, 127, 127);
 
+char deviceID[16] = {0};
 char ssid[32] = {0};
 char password[64] = {0};
 char hostString[32] = {0};
@@ -88,6 +89,7 @@ void setup(void){
   //digitalWrite(LED_BUILTIN, LOW);
   Serial.begin(115200);
   Serial.println("");
+  sprintf(deviceID, "LAMPARA_%06X", ESP.getChipId());
 
   setupEeprom();
 
@@ -98,7 +100,7 @@ void setup(void){
 
   // set standard hostname if not loaded from EEPROM
   if (!hostString[0]){
-    sprintf(hostString, "LAMPARA_%06X", ESP.getChipId());
+    sprintf(hostString, "%s", deviceID);
   }
   WiFi.hostname(hostString);
   WiFi.begin(ssid, password);
@@ -123,6 +125,9 @@ void setup(void){
   
   server.on("/", handleRoot);
   server.on("/color", setColor);
+  server.on("/id", [](){
+    server.send(200, "text/plain", deviceID);
+  });
   server.serveStatic("/iro.js", SPIFFS, "/iro.js");
   server.onNotFound(handleNotFound);
   server.begin();
