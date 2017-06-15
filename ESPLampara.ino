@@ -128,7 +128,9 @@ void setup(void){
   server.on("/id", [](){
     server.send(200, "text/plain", deviceID);
   });
-  server.serveStatic("/iro.js", SPIFFS, "/iro.js");
+  server.serveStatic("/bootstrap.min.css", SPIFFS, "/bootstrap.min.css", "max-age=86400");
+  server.serveStatic("/favicon.png", SPIFFS, "/favicon.png", "max-age=86400");
+  server.serveStatic("/iro.js", SPIFFS, "/iro.js", "max-age=86400");
   server.onNotFound(handleNotFound);
   server.begin();
   Serial.println("HTTP server started");

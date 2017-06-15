@@ -1,11 +1,24 @@
+<!DOCTYPE html>
 <html>
+<head>
 <meta charset="utf-8">
 <title>{{hostname}}</title>
-<body>
-<div id="picker"></div>
+<link href="favicon.png" rel="icon" type="image/x-icon">
 <script src="iro.js"></script>
+<link rel="stylesheet" href="bootstrap.min.css">
+</head>
+<body>
+<nav class="navbar navbar-inverse navbar-static-top">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#"><img src="favicon.png" height="24px" width="24px"></a>
+      <a class="navbar-brand" href="#">{{hostname}}</a>
+    </div>
+  </div>
+</nav>
+<div class="container-fluid"><div id="picker"></div></div>
 <script type="text/javascript">
-var size = Math.min(window.innerWidth, window.innerHeight) *0.9;
+var size = Math.min(window.innerWidth, window.innerHeight) *0.85;
 var colorPicker = new iro.ColorPicker("#picker", {
   width: size,
   height: size,
@@ -27,4 +40,5 @@ function setColor() {
   req.open("GET", "/color?r="+rgb.r+"&g="+rgb.g+"&b="+rgb.b, true); req.send();
 };
 </script>
-</body></html>
+</body>
+</html>
