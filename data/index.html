@@ -2,6 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width; initial-scale=1; maximum-scale=1; user-scalable=0;"/>
 <title>{{hostname}}</title>
 <link href="favicon.png" rel="icon" type="image/x-icon">
 <script src="iro.js"></script>
@@ -18,7 +19,10 @@
 </nav>
 <div class="container-fluid"><div id="picker"></div></div>
 <script type="text/javascript">
-var size = Math.min(window.innerWidth, window.innerHeight) *0.85;
+if (window.innerWidth < window.innerHeight)
+  var size = window.innerWidth * 0.85;
+else
+  var size = window.innerHeight - 30;
 var colorPicker = new iro.ColorPicker("#picker", {
   width: size,
   height: size,
